@@ -1,69 +1,80 @@
-import torch  # for deep learning
-from torch import nn  # for neural network
-from torch.utils.data import DataLoader  # for creating data loaders
-from tqdm import tqdm  # for progress bar
+import torch
+import torchaudio
+from torch import nn
+from torch.utils.data import DataLoader
 
-BATCH_SIZE = 128  # number of data points in each batch
-EPOCHS = 10  # number of times to pass through the whole dataset
-# LEARNING_RATE = 1e-3  # learning rate
-LEARNING_RATE = 0.001  # learning rate
+from urbansounddataset import UrbanSoundDataset
+from cnn import CNNNetwork
 
 
-def train_one_epoch(model, data_loader, loss_fn, optimizer, device):  # train one epoch
-    for inputs, targets in tqdm(data_loader):
-        inputs, targets = inputs.to(device), targets.to(device)  # send data to device
+BATCH_SIZE = 128
+EPOCHS = 10
+LEARNING_RATE = 0.001
+
+ANNOTATIONS_FILE = "/Users/mehmetcanbudak/Projects/Mehmetcan/PyTorch_Audio/UrbanSound8K/UrbanSound8K.csv"
+AUDIO_DIR = "/Users/mehmetcanbudak/Projects/Mehmetcan/PyTorch_Audio/UrbanSound8K/audio"
+SAMPLE_RATE = 22050
+NUM_SAMPLES = 22050
+
+
+def create_data_loader(train_data, batch_size):
+    train_dataloader = DataLoader(train_data, batch_size=batch_size)
+    return train_dataloader
+
+
+def train_single_epoch(model, data_loader, loss_fn, optimiser, device):
+    for input, target in data_loader:
+        input, target = input.to(device), target.to(device)
 
         # calculate loss
-        predictions = model(inputs)  # forward pass
-        loss = loss_fn(predictions, targets)  # calculate loss
+        prediction = model(input)
+        loss = loss_fn(prediction, target)
 
-        # bacpropogate loss and update weights
-        optimiser.zero_grad()  # reset gradients
-        loss.backward()  # backpropogate loss
-        optimiser.step()  # update weights
+        # backpropagate error and update weights
+        optimiser.zero_grad()
+        loss.backward()
+        optimiser.step()
 
-    print(f"Loss: {loss.item()}")
+    print(f"loss: {loss.item()}")
 
 
-def train(model, data_loader, loss_fn, optimizer, device, epochs):  # train model
-    for i in range(epochs):  # train for number of epochs
-        print(f"Epoch {i+1}")  # print epoch number
-        train_one_epoch(
-            model, data_loader, loss_fn, optimizer, device
-        )  # train one epoch
-        print("---------------------------")  # print seperator
-    print("Training is done.")  # print finished message
+def train(model, data_loader, loss_fn, optimiser, device, epochs):
+    for i in range(epochs):
+        print(f"Epoch {i+1}")
+        train_single_epoch(model, data_loader, loss_fn, optimiser, device)
+        print("---------------------------")
+    print("Finished training")
 
 
 if __name__ == "__main__":
-    # download MNIST dataset
-    train_data, _ = download_mnist_datasets()
-    print("MNIST dataset downloaded successfully")
+    if torch.cuda.is_available():
+        device = "cuda"
+    else:
+        device = "cpu"
+    print(f"Using {device}")
 
-    # create data loader for the train set
-    train_dataloader = DataLoader(train_data, batch_size=BATCH_SIZE)
+    # instantiating our dataset object and create data loader
+    mel_spectrogram = torchaudio.transforms.MelSpectrogram(
+        sample_rate=SAMPLE_RATE, n_fft=1024, hop_length=512, n_mels=64
+    )
 
-    # build model
-    device = "cuda" if torch.cuda.is_available() else "cpu"  # check if GPU is available
-    print(f"Using {device} device")
-    feed_forward_net = FeedForwardNet().to(device)  # create model and send it to device
+    usd = UrbanSoundDataset(
+        ANNOTATIONS_FILE, AUDIO_DIR, mel_spectrogram, SAMPLE_RATE, NUM_SAMPLES, device
+    )
 
-    # instantiate loss function and optimiser
-    loss_fn = nn.CrossEntropyLoss()  # instantiate loss function
-    # optimiser = torch.optim.SGD(
-    #     feed_forward_net.parameters(), lr=1e-3
-    # )  # instantiate optimiser with SGD
-    optimiser = torch.optim.Adam(
-        feed_forward_net.parameters(), lr=LEARNING_RATE
-    )  # instantiate optimiser with Adam
+    train_dataloader = create_data_loader(usd, BATCH_SIZE)
+
+    # construct model and assign it to device
+    cnn = CNNNetwork().to(device)
+    print(cnn)
+
+    # initialise loss funtion + optimiser
+    loss_fn = nn.CrossEntropyLoss()
+    optimiser = torch.optim.Adam(cnn.parameters(), lr=LEARNING_RATE)
 
     # train model
-    train(
-        feed_forward_net, train_dataloader, loss_fn, optimiser, device, EPOCHS
-    )  # train model
+    train(cnn, train_dataloader, loss_fn, optimiser, device, EPOCHS)
 
-    # save trained model
-    torch.save(feed_forward_net.state_dict(), "feedforwardnet_mnist.pth")  # save model
-    print(
-        "Model trained and saved successfully at feedforwardnet_mnist.pth"
-    )  # print finished message
+    # save model
+    torch.save(cnn.state_dict(), "feedforwardnet_ubs.pth")
+    print("Trained feed forward net saved at feedforwardnet_ubs.pth")
