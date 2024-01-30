@@ -16,10 +16,14 @@ class UrbanSoundDataset(Dataset):
         transformation,
         target_sample_rate,
         num_samples,
+        device,
     ):  # constructor
         self.annotations = pd.read_csv(annotations_file)  # load annotations file
         self.audio_dir = audio_dir  # set audio directory
-        self.transformation = transformation  # set transformation
+        self.device = device  # set device
+        self.transformation = transformation.to(
+            self.device
+        )  # set transformation to device
         self.target_sample_rate = target_sample_rate  # set target sample rate
         self.num_samples = num_samples  # set number of samples
 
@@ -30,12 +34,13 @@ class UrbanSoundDataset(Dataset):
         audio_sample_path = self._get_audio_sample_path(index)  # get audio sample path
         label = self._get_audio_sample_label(index)  # get audio sample label
         signal, sr = torchaudio.load(audio_sample_path)  # load audio sample
+        signal = signal.to(self.device)  # send signal to device
         # signal -> (num_channels, samples) -> (2, 16000) -> (1, 16000)
         signal = self._resample_if_necessary(signal, sr)  # resample signal if necessary
         signal = self._mix_down_if_necessary(signal)  # mix down signal if necessary
-        signal = self.transformation(signal)  # apply transformation
         signal = self._cut_if_necessary(signal)  # cut signal if necessary
         signal = self._right_pad_if_necessary(signal)  # right pad signal if necessary
+        signal = self.transformation(signal)  # apply transformation
         return signal, label  # return signal and label
 
     def _cut_if_necessary(self, signal):  # cut signal if necessary
@@ -89,6 +94,12 @@ if __name__ == "__main__":
     SAMPLE_RATE = 22050  # sample rate of audio file
     NUM_SAMPLES = 22050  # number of samples
 
+    if torch.cuda.is_available():
+        device = "cuda"
+    else:
+        device = "cpu"
+    print(f"Using device: {device}")
+
     mel_spectrogram = torchaudio.transforms.MelSpectrogram(
         sample_rate=SAMPLE_RATE,  # sample rate of audio file
         n_fft=1024,  # number of samples in each fourier transform
@@ -98,7 +109,7 @@ if __name__ == "__main__":
     # ms = mel_spectogram(signal)
 
     usd = UrbanSoundDataset(
-        ANNOTAIONS_FILE, AUDIO_DIR, mel_spectrogram, SAMPLE_RATE, NUM_SAMPLES
+        ANNOTAIONS_FILE, AUDIO_DIR, mel_spectrogram, SAMPLE_RATE, NUM_SAMPLES, device
     )  # instantiate dataset
     print(f"There are {len(usd)} samples in the dataset.")  # print length of dataset
     signal, label = usd[0]  # get first sample
