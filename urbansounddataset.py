@@ -5,7 +5,6 @@ import pandas as pd  # for data processing
 import torchaudio  # for audio processing
 import os  # for file path
 
-
 class UrbanSoundDataset(Dataset):
     def __init__(
         self, annotations_file, audio_dir, transformation, target_sample_rate
@@ -44,7 +43,7 @@ class UrbanSoundDataset(Dataset):
     def _get_audio_sample_path(self, index):  # get audio sample path
         fold = f"fold{self.annotations.iloc[index, 5]}"  # get fold number
         path = os.path.join(
-            self.audio_dir, fold, self.annotations.iloc[index, 0]
+            self.audio_dir, fold, self.annotations.iloc[index, 0] 
         )  # create path using filename in annotations file
         return path  # return audio sample path
 
@@ -53,8 +52,8 @@ class UrbanSoundDataset(Dataset):
 
 
 if __name__ == "__main__":
-    ANNOTAIONS_FILE = "/Users/mehmetcanbudak/Projects/Mehmetcan/PyTorch_Audio/UrbanSound8K/metadata/UrbanSound8K.csv"
-    AUDIO_DIR = "/Users/mehmetcanbudak/Projects/Mehmetcan/PyTorch_Audio/UrbanSound8K/audio"
+    ANNOTAIONS_FILE = "/Users/mehmetcanbudak/Projects/Mehmetcan/PyTorch_Audio/UrbanSound8K.csv"
+    AUDIO_DIR = "/Users/mehmetcanbudak/Projects/Mehmetcan/PyTorch_Audio/UrbanSound8K/audio/"
     SAMPLE_RATE = 16000  # sample rate of audio file
 
     mel_spectrogram = torchaudio.transforms.MelSpectrogram(
@@ -70,4 +69,9 @@ if __name__ == "__main__":
     )  # instantiate dataset
     print(f"There are {len(usd)} samples in the dataset.")  # print length of dataset
     signal, label = usd[0]  # get first sample
-    a = 1
+        
+    #print(f"Sample Rate: {SAMPLE_RATE}") # print sample rate
+
+    df = pd.read_csv("/Users/mehmetcanbudak/Projects/Mehmetcan/PyTorch_Audio/UrbanSound8K.csv")
+    print("Some samples from the dataset:")
+    print(f"{df.head()}")
