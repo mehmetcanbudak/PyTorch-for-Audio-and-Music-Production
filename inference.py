@@ -1,8 +1,10 @@
 # Load back the previously created model and make inferences
 import torch
+import torchaudio
 
 from cnn import CNNNetwork
-from train import _
+from urbansounddataset import UrbanSoundDataset
+from train import AUDIO_DIR, ANNOTATIONS_FILE, SAMPLE_RATE, NUM_SAMPLES
 
 class_mapping = [
     "air_conditioner",
@@ -31,18 +33,25 @@ def predict(model, input, target, class_mapping):  # make prediction
 if __name__ == "__main__":
     # load back the model
     cnn = CNNNetwork()
-    state_dict = torch.load("feedforwardnet_mnist.pth")  # load trained weights
-    feed_forward_net.load_state_dict(state_dict)  # load weights into model
+    state_dict = torch.load(
+        "/Users/mehmetcanbudak/Projects/Mehmetcan/PyTorch_Audio/cnnnet.pth",
+        map_location=torch.device("cpu"),
+    )  # load trained weights
+    cnn.load_state_dict(state_dict)  # load weights into model
 
-    # load MNIST validation dataset
-    _, validation_data = download_mnist_datasets()  # download validation dataset
+    # load UrbanSoundDataset dataset
+    mel_spectrogram = torchaudio.transforms.MelSpectrogram(
+        sample_rate=SAMPLE_RATE, n_fft=1024, hop_length=512, n_mels=64
+    )
 
-    # get a sample from the validation dataset for inference
-    input, target = validation_data[0][0], validation_data[0][1]  # get first sample
-    # sample = next(iter(validation_data))  # get a sample from the dataset
+    usd = UrbanSoundDataset(
+        ANNOTATIONS_FILE, AUDIO_DIR, mel_spectrogram, SAMPLE_RATE, NUM_SAMPLES, "cpu"
+    )  # instantiate dataset
+
+    # get a sample from the urban sound dataset for inference
+    input, target = usd[0][0], usd[0][1]  # [batch_size, num_channels, fr, time]
+    input.unsqueeze_(0)
 
     # make inference
-    predicted, expected = predict(
-        feed_forward_net, input, target, class_mapping
-    )  # make inference
+    predicted, expected = predict(cnn, input, target, class_mapping)  # make inference
     print(f"Predicted: {predicted}, Expected: {expected}")  # print prediction
