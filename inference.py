@@ -1,5 +1,6 @@
 # Load back the previously created model and make inferences
 import torch
+
 from train import FeedForwardNet, download_mnist_datasets
 
 # class_mapping = ["rock", "classical", "jazz", "pop"] # class mapping
