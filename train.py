@@ -2,6 +2,7 @@ import torch
 import torchaudio
 from torch import nn
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 from urbansounddataset import UrbanSoundDataset
 from cnn import CNNNetwork
@@ -23,7 +24,7 @@ def create_data_loader(train_data, batch_size):
 
 
 def train_single_epoch(model, data_loader, loss_fn, optimiser, device):
-    for input, target in data_loader:
+    for input, target in tqdm(data_loader):
         input, target = input.to(device), target.to(device)
 
         # calculate loss
