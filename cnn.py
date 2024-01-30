@@ -63,9 +63,9 @@ class CNNNetwork(nn.Module):
         x = self.conv4(x)  # pass data to conv4
         x = self.flatten(x)  # flatten the input data
         logits = self.linear(x)  # pass data to dense layers
-        predictions = self.softmax(x)  # apply softmax function
-        return predictions  # return predictions
-        #return logits
+        return logits # return logits
+        #predictions = self.softmax(x)  # apply softmax function
+        #return predictions  # return predictions
 
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # get device
