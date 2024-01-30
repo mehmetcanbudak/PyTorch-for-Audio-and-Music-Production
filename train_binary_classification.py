@@ -1,11 +1,9 @@
 #  Implement a CNN for Binary Sound Classification
 
 # What would one have to change if the problem were not multiclass but just binary classification?
-# change the output layer to only have 1 output 
-# and change the loss function to be nn.BCELoss (BinaryCrossEntropyLoss). 
+# change the output layer to only have 1 output
+# and change the loss function to be nn.BCELoss (BinaryCrossEntropyLoss).
 # Then change output activation function from SoftMax to Sigmoid.
- 
-
 
 
 import torch
@@ -63,9 +61,9 @@ class CNNNetwork_Binary(nn.Module):
         )
         self.flatten = nn.Flatten()  # flatten the image tensors
         self.linear = nn.Linear(128 * 5 * 4, 1)  # linear layer 1 class
-        #self.softmax = nn.Softmax(dim=1)  # apply softmax function
-        self.Sigmoid = nn.Sigmoid() # apply sigmoid function
-    
+        # self.softmax = nn.Softmax(dim=1)  # apply softmax function
+        self.Sigmoid = nn.Sigmoid()  # apply sigmoid function
+
     def forward(self, input_data):  # forward pass
         x = self.conv1(input_data)  # pass data to conv1
         x = self.conv2(x)  # pass data to conv2
@@ -73,9 +71,10 @@ class CNNNetwork_Binary(nn.Module):
         x = self.conv4(x)  # pass data to conv4
         x = self.flatten(x)  # flatten the input data
         logits = self.linear(x)  # pass data to dense layers
-        return logits # return logits
-        #predictions = self.sigmoid(x)  # apply softmax function
-        #return predictions  # return predictions
+        return logits  # return logits
+        # predictions = self.sigmoid(x)  # apply softmax function
+        # return predictions  # return predictions
+
 
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # get device
