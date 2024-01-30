@@ -4,11 +4,12 @@
 # 4- train model
 # 5- save trained model
 
-import torch
-from torch import nn
-from torch.utils.data import DataLoader
-from torchvision import datasets
-from torchvision.transforms import ToTensor
+import torch  # for deep learning
+from torch import nn  # for neural network
+from torch.utils.data import DataLoader  # for creating data loaders
+from torchvision import datasets  # for datasets
+from torchvision.transforms import ToTensor  # for data transformation
+from tqdm import tqdm  # for progress bar
 
 BATCH_SIZE = 128  # number of data points in each batch
 EPOCHS = 10  # number of times to pass through the whole dataset
@@ -51,7 +52,7 @@ def download_mnist_datasets():
 
 
 def train_one_epoch(model, data_loader, loss_fn, optimizer, device):  # train one epoch
-    for inputs, targets in data_loader:
+    for inputs, targets in tqdm(data_loader):
         inputs, targets = inputs.to(device), targets.to(device)  # send data to device
 
         # calculate loss
