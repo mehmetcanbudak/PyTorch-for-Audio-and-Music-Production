@@ -161,3 +161,4 @@ cython_debug/
 
 UrbanSound8K.tar.gz/
 UrbanSound8K/
+.DS_Store
