@@ -25,7 +25,7 @@ Insert gif or link to demo
 ```bash
 usage: cli.py [-h] input_image output_image
 
-Audio + Music Production
+Audio & Music Production
 
 positional arguments:
   input_path   Path to input file.
@@ -44,27 +44,19 @@ Install PyTorch for Audio and Music Production repo with pip.
 pip install -r requirements.txt
 ```
     
-## Environment Variables
-
-To run this project, you will need to add the following environment variables to your .env file
-
-`API_KEY`
-
-`ANOTHER_API_KEY`
-
-
 ## Deployment
 
 To deploy this project run
 
 ```bash
-  npm run deploy
+  mamba create --name audio python=3.11
+  mamba activate audio
 ```
 
 
 ## Documentation
 
-[Documentation](https://linktodocumentation)
+[Documentation](https://github.com/mehmetcanbudak/PyTorch_Audio)
 
 
 ## License
