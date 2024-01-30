@@ -51,7 +51,7 @@ def download_mnist_datasets():
 
 
 def train_one_epoch(model, data_loader, loss_fn, optimizer, device):  # train one epoch
-    for input, targets in data_loader:
+    for inputs, targets in data_loader:
         inputs, targets = inputs.to(device), targets.to(device)  # send data to device
 
         # calculate loss
@@ -102,3 +102,7 @@ if __name__ == "__main__":
     train(
         feed_forward_net, train_dataloader, loss_fn, optimiser, device, EPOCHS
     )  # train model
+
+    # save trained model
+    torch.save(feed_forward_net.state_dict(), "feedforwardnet_mnist.pth")  # save model
+    print("Model trained and saved successfully at feedforwardnet_mnist.pth")
