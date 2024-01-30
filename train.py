@@ -106,4 +106,6 @@ if __name__ == "__main__":
 
     # save trained model
     torch.save(feed_forward_net.state_dict(), "feedforwardnet_mnist.pth")  # save model
-    print("Model trained and saved successfully at feedforwardnet_mnist.pth")
+    print(
+        "Model trained and saved successfully at feedforwardnet_mnist.pth"
+    )  # print finished message
