@@ -17,7 +17,7 @@ class CNNNetwork(nn.Module):
                 padding=2,  # padding of 2
             ),
             nn.ReLU(),  # activation function
-            nn.MaxPool2d(kernel_size=2)  # max pooling layer
+            nn.MaxPool2d(kernel_size=2),  # max pooling layer
         )
         self.conv2 = nn.Sequential(
             nn.Conv2d(  # 2nd convolutional layer
@@ -28,7 +28,7 @@ class CNNNetwork(nn.Module):
                 padding=2,  # padding of 2
             ),
             nn.ReLU(),  # activation function
-            nn.MaxPool2d(kernel_size=2)  # max pooling layer
+            nn.MaxPool2d(kernel_size=2),  # max pooling layer
         )
         self.conv3 = nn.Sequential(
             nn.Conv2d(  # 3rd convolutional layer
@@ -39,7 +39,7 @@ class CNNNetwork(nn.Module):
                 padding=2,  # padding of 2
             ),
             nn.ReLU(),  # activation function
-            nn.MaxPool2d(kernel_size=2), # max pooling layer
+            nn.MaxPool2d(kernel_size=2),  # max pooling layer
         )
         self.conv4 = nn.Sequential(
             nn.Conv2d(  # 4th convolutional layer
@@ -50,7 +50,7 @@ class CNNNetwork(nn.Module):
                 padding=2,  # padding of 2
             ),
             nn.ReLU(),  # activation function
-            nn.MaxPool2d(kernel_size=2)  # max pooling layer
+            nn.MaxPool2d(kernel_size=2),  # max pooling layer
         )
         self.flatten = nn.Flatten()  # flatten the image tensors
         self.linear = nn.Linear(128 * 5 * 4, 10)  # linear layer 10classes
@@ -68,10 +68,14 @@ class CNNNetwork(nn.Module):
 
 
 if __name__ == "__main__":
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # get device
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # get device
     cnn = CNNNetwork().to(device)  # instantiate model
-    batch_size = 1 # batch size
-    summary(cnn, input_size=(batch_size, 1, 64, 44), device=device) # print model summary
-    print(f"Using Device: {device}") # print device
-    print("------------------------------------------------------------------------------------")
+    batch_size = 1  # batch size
+    summary(
+        cnn, input_size=(batch_size, 1, 64, 44), device=device
+    )  # print model summary
+    print(f"Using Device: {device}")  # print device
+    print(
+        "------------------------------------------------------------------------------------"
+    )
     print(cnn)  # print model architecture
