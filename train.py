@@ -4,9 +4,8 @@ from torch import nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from urbansounddataset import UrbanSoundDataset
 from cnn import CNNNetwork
-
+from urbansounddataset import UrbanSoundDataset
 
 BATCH_SIZE = 128
 EPOCHS = 10
